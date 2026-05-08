@@ -1,20 +1,71 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <title>Sapling - Folder Generator</title>
+    <title>FolderGen - Folder Generator</title>
     <style>
-        body { font-family: sans-serif; background: #0f172a; color: white; display: flex; flex-direction: column; height: 100vh; margin: 0; }
-        header { padding: 20px; background: #1e293b; display: flex; justify-content: space-between; }
-        .container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 20px; flex: 1; }
-        textarea { background: #1e293b; color: #94a3b8; border: 1px solid #334155; border-radius: 8px; padding: 15px; font-family: monospace; }
-        #preview { background: #020617; border-radius: 8px; padding: 15px; overflow-y: auto; white-space: pre; font-family: monospace; }
-        button { background: #2563eb; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; }
-        button:hover { background: #3b82f6; }
+        body {
+            font-family: sans-serif;
+            background: #0f172a;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            margin: 0;
+        }
+
+        header {
+            padding: 20px;
+            background: #1e293b;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 20px;
+            flex: 1;
+        }
+
+        textarea {
+            background: #1e293b;
+            color: #94a3b8;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 15px;
+            font-family: monospace;
+        }
+
+        #preview {
+            background: #020617;
+            border-radius: 8px;
+            padding: 15px;
+            overflow-y: auto;
+            white-space: pre;
+            font-family: monospace;
+        }
+
+        button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: #3b82f6;
+        }
     </style>
 </head>
+
 <body>
     <header>
-        <h1>Sapling 🌲</h1>
+        <h1>FolderGen 📁</h1>
         <button onclick="downloadZip()">Download .zip</button>
     </header>
     <div class="container">
@@ -27,8 +78,40 @@
         const input = document.getElementById('input');
         const preview = document.getElementById('preview');
 
+        // Helper function to clean common AI junk from a line
+        function cleanLineText(line) {
+            // 1. Strip comments (#, //, --)
+            let clean = line.split('#')[0].split('//')[0].split('--')[0];
+
+            // 2. Strip tree symbols (│, ├, └, ─)
+            clean = clean.replace(/[│├└─]/g, '');
+
+            // 3. Strip trailing slashes (some AI write "folder/")
+            clean = clean.trim().replace(/[/\\]$/, '');
+
+            return clean;
+        }
+
         function updatePreview() {
-            preview.innerText = input.value; // Simple preview logic
+            const lines = input.value.split('\n');
+            let previewText = "";
+
+            lines.forEach(line => {
+                if (!line.trim()) return;
+
+                const name = cleanLineText(line);
+                if (!name) return;
+
+                // Calculate depth for visual indentation in the preview
+                const depth = line.search(/\S/);
+                const indent = " ".repeat(depth);
+
+                // Add a little emoji to the preview for vibes
+                const icon = name.includes('.') ? "📄 " : "📁 ";
+                previewText += `${indent}${icon}${name}\n`;
+            });
+
+            preview.innerText = previewText || "Preview will appear here...";
         }
 
         async function downloadZip() {
@@ -38,10 +121,17 @@
 
             lines.forEach(line => {
                 if (!line.trim()) return;
-                const name = line.replace(/[│├└─]/g, '').trim();
+
+                const name = cleanLineText(line);
+                if (!name) return;
+
                 const depth = line.search(/\S/);
 
-                const parentDepth = Object.keys(lastAtDepth).map(Number).filter(d => d < depth).sort((a,b)=>b-a)[0] || -1;
+                const parentDepth = Object.keys(lastAtDepth)
+                    .map(Number)
+                    .filter(d => d < depth)
+                    .sort((a, b) => b - a)[0] ?? -1;
+
                 const currentParent = lastAtDepth[parentDepth];
 
                 if (name.includes('.')) {
@@ -52,7 +142,7 @@
                 }
             });
 
-            const content = await zip.generateAsync({type:"blob"});
+            const content = await zip.generateAsync({ type: "blob" });
             const url = window.URL.createObjectURL(content);
             const a = document.createElement("a");
             a.href = url;
@@ -61,4 +151,5 @@
         }
     </script>
 </body>
+
 </html>
