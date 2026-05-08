@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sapling - Folder Generator</title>
+    <style>
+        body { font-family: sans-serif; background: #0f172a; color: white; display: flex; flex-direction: column; height: 100vh; margin: 0; }
+        header { padding: 20px; background: #1e293b; display: flex; justify-content: space-between; }
+        .container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 20px; flex: 1; }
+        textarea { background: #1e293b; color: #94a3b8; border: 1px solid #334155; border-radius: 8px; padding: 15px; font-family: monospace; }
+        #preview { background: #020617; border-radius: 8px; padding: 15px; overflow-y: auto; white-space: pre; font-family: monospace; }
+        button { background: #2563eb; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        button:hover { background: #3b82f6; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Sapling 🌲</h1>
+        <button onclick="downloadZip()">Download .zip</button>
+    </header>
+    <div class="container">
+        <textarea id="input" placeholder="Paste structure here..." oninput="updatePreview()"></textarea>
+        <div id="preview">Preview will appear here...</div>
+    </div>
+
+    <script src="node_modules/jszip/dist/jszip.min.js"></script>
+    <script>
+        const input = document.getElementById('input');
+        const preview = document.getElementById('preview');
+
+        function updatePreview() {
+            preview.innerText = input.value; // Simple preview logic
+        }
+
+        async function downloadZip() {
+            const zip = new JSZip();
+            const lines = input.value.split('\n');
+            const lastAtDepth = { [-1]: zip };
+
+            lines.forEach(line => {
+                if (!line.trim()) return;
+                const name = line.replace(/[│├└─]/g, '').trim();
+                const depth = line.search(/\S/);
+
+                const parentDepth = Object.keys(lastAtDepth).map(Number).filter(d => d < depth).sort((a,b)=>b-a)[0] || -1;
+                const currentParent = lastAtDepth[parentDepth];
+
+                if (name.includes('.')) {
+                    currentParent.file(name, "");
+                } else {
+                    const folder = currentParent.folder(name);
+                    lastAtDepth[depth] = folder;
+                }
+            });
+
+            const content = await zip.generateAsync({type:"blob"});
+            const url = window.URL.createObjectURL(content);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "project_structure.zip";
+            a.click();
+        }
+    </script>
+</body>
+</html>

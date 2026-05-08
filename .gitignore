@@ -1,0 +1,31 @@
+# --- OS Metadata ---
+.DS_Store
+Thumbs.db
+
+# --- IDEs / Editors ---
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# --- Environments / Secrets ---
+.env
+.venv/
+env/
+venv/
+bin/
+obj/
+
+# --- Build / Output ---
+dist/
+build/
+out/
+*.exe
+*.dll
+*.so
+
+# --- Node / Logs ---
+node_modules/
+npm-debug.log*
+yarn-error.log*
+*.log

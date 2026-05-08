@@ -1,0 +1,43 @@
+{
+  "dependencies": {
+    "electron-squirrel-startup": "^1.0.1",
+    "jszip": "^3.10.1",
+    "lucide-react": "^1.14.0"
+  },
+  "name": "foldergen",
+  "version": "1.0.0",
+  "author": "Shanmugavasan Ravindran", 
+  "description": "A tool to generate folder structures from AI text.",
+  "main": "main.js",
+  "devDependencies": {
+    "@electron-forge/cli": "^7.11.1",
+    "@electron-forge/maker-deb": "^7.11.1",
+    "@electron-forge/maker-rpm": "^7.11.1",
+    "@electron-forge/maker-squirrel": "^7.11.1",
+    "@electron-forge/maker-zip": "^7.11.1",
+    "@electron-forge/plugin-auto-unpack-natives": "^7.11.1",
+    "@electron-forge/plugin-fuses": "^7.11.1",
+    "@electron/fuses": "^1.8.0",
+    "electron": "^42.0.0"
+  },
+  "scripts": {
+    "start": "electron-forge start",
+    "make": "electron-forge make",
+    "package": "electron-forge package"
+  },
+  "config": {
+  "forge": {
+    "makers": [
+      {
+        "name": "@electron-forge/maker-squirrel",
+        "config": {
+          "name": "foldergen"
+        }
+      }
+    ]
+  }
+},
+  "keywords": [],
+  "license": "ISC",
+  "type": "commonjs"
+}
