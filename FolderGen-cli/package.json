@@ -1,0 +1,12 @@
+{
+  "name": "FolderGen-cli",
+  "version": "1.0.0",
+  "description": "Generate folder structures from terminal paste",
+  "main": "index.js",
+  "bin": {
+    "foldergen": "./index.js"
+  },
+  "keywords": [],
+  "author": "Shanmugavasan Ravindran",
+  "license": "ISC"
+}
